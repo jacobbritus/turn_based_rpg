@@ -1,0 +1,67 @@
+Here’s your **Trello-style board** for the turn-based RPG project. Each **column** is a phase of development, and the **cards** are individual features or tasks within that phase. You can treat each card like something to move from "To Do" → "In Progress" → "Done".
+
+---
+
+## 🟩 Phase 1: Core Combat (✅ Complete)
+
+* ✅ Create `Character` class with HP and attack
+* ✅ Implement player and enemy turns
+* ✅ Add heal and attack options
+* ✅ Create basic combat loop
+
+---
+
+## 🟦 Phase 2: Depth and Strategy
+
+* ⬜ Add more enemy types (e.g., Orc, Mage, Skeleton)
+* ⬜ Add potion system (limit healing)
+* ⬜ Add basic item system (e.g., damage boost, defense buff)
+* ⬜ Add action description variety for immersion
+
+---
+
+## 🟨 Phase 3: Smarter Enemies (AI)
+
+* ⬜ Randomize enemy actions
+* ⬜ Add enemy decision-making (heal if low HP)
+* ⬜ Create different enemy personalities (aggressive, defensive)
+
+---
+
+## 🟧 Phase 4: Progression System
+
+* ⬜ Add XP system (earn after battle)
+* ⬜ Add level-up system (boost stats)
+* ⬜ Add gold or loot rewards
+
+---
+
+## 🟪 Phase 5: World and Story
+
+* ⬜ Add exploration options (e.g., Forest, Cave, Shop)
+* ⬜ Add small story texts (before/after battles)
+* ⬜ Create a shop system (buy potions, items)
+* ⬜ Add inventory system
+
+---
+
+## 🟥 Phase 6: Polish and UX
+
+* ⬜ Add health bars or visual HP representation
+* ⬜ Improve screen update without flicker
+* ⬜ Add turn indicator (whose turn it is)
+* ⬜ Add text-based sound effects or flavor text
+
+---
+
+## 🟫 Phase 7: Bonus Ideas (Optional/Long-Term)
+
+* ⬜ Add party system (multiple heroes)
+* ⬜ Implement boss fights with special mechanics
+* ⬜ Add save/load system (using JSON or file writing)
+* ⬜ Add ASCII art for enemies
+* ⬜ Port to GUI (with `tkinter` or `textual`)
+
+---
+
+Would you like this in a downloadable format (like Markdown or CSV), or added to a real Trello board you can interact with?

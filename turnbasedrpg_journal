@@ -1,0 +1,10 @@
+24-05-2025
+created a Character class (player and enemy)
+implemented player and enemy turns
+added attack and heal options
+created a basic combat loop
+
+25-05-2025
+plan:
+add attack accuracy
+more enemies types
