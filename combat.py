@@ -61,10 +61,10 @@ def display_hp(player, enemy):
 def player_turn(player, enemy):
     while True:
 
-        user_input = input("1. Attack\n2. Heal\n> ")
+        user_input = input("[A]ttack\n[H]eal\n> ")
         clear_terminal()
 
-        if user_input == "1":
+        if user_input == "A":
             display_hp(knight, goblin)
 
             print(f"{player.name} attacked {enemy.name}.")
@@ -75,7 +75,7 @@ def player_turn(player, enemy):
             display_hp(knight, goblin)
 
             return
-        elif user_input == "2":
+        elif user_input == "H":
             display_hp(knight, goblin)
 
             player.heal(5)
