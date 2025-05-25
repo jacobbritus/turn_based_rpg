@@ -1,7 +1,7 @@
 chatGPT_roadmap
 turnbasedrpg_journal
-classes
-scrolling_text
+classes.py
+scrolling_text.py
 *.pyc
 
 # So if files are still showing on GitHub but you want to ignore them:
