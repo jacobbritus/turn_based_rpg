@@ -3,3 +3,27 @@ turnbasedrpg_journal
 classes
 scrolling_text
 *.pyc
+
+# So if files are still showing on GitHub but you want to ignore them:
+  #Add the files or patterns to .gitignore (you’ve done this).
+  #
+  #Remove the files from git tracking but keep them locally by running:
+  #
+  #bash
+  #Copy code
+  #git rm --cached filename
+  #or for multiple files/patterns:
+  #
+  #bash
+  #Copy code
+  #git rm -r --cached foldername
+  #Commit the changes:
+  #
+  #bash
+  #Copy code
+  #git commit -m "Remove ignored files from tracking"
+  #Push to GitHub:
+  #
+  #bash
+  #Copy code
+  #git push origin main  # or master, depending on your branch
