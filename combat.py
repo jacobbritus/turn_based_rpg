@@ -2,6 +2,7 @@ import os
 import random
 from colorama import Fore
 
+
 def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
@@ -18,11 +19,18 @@ class Character:
 
     def take_damage(self, amount, accuracy):
         hit_or_not = random.randint(0, 100)
+        critical_hit = random.randint(0, 100)
 
         if not hit_or_not > accuracy:
 
-            self.hp -= amount
-            print(f"{self.name} took {amount} damage!")
+            if critical_hit < 5:
+                print("Critical hit!")
+                self.hp -= amount
+                print(f"{self.name} took {float(amount * 1.25)} damage!")
+
+            else:
+                self.hp -= amount
+                print(f"{self.name} took {amount} damage!")
         else:
             print(f"{self.name} evaded the attack!")
 
@@ -33,8 +41,27 @@ class Character:
         print(f"{self.name} drank a health potion and regained {amount} hp!")
 
 
-knight = Character("Player", "Knight", 30, 5, 80, 7)
-goblin = Character("Enemy", "Goblin", 15, 3, 50, 9)
+knight = Character(character_type = "Player", name = "Knight", hp = 30, attack = 5, accuracy = 80, speed = 7)
+
+
+goblin = Character(character_type = "Enemy", name = "Goblin", hp = 15, attack = 3, accuracy = 50, speed = 8)
+
+enemy_dict = {
+    "Goblin": Character(character_type="Enemy", name="Goblin", hp=15, attack=3, accuracy=70, speed=8),
+    "Orc": Character(character_type="Enemy", name="Orc", hp=30, attack=7, accuracy=50, speed=3),
+    "Skeleton": Character(character_type="Enemy", name="Skeleton", hp=20, attack=5, accuracy=60, speed=6),
+    "Slime": Character(character_type="Enemy", name="Slime", hp=10, attack=2, accuracy=80, speed=2),
+    "Bandit": Character(character_type="Enemy", name="Bandit", hp=18, attack=6, accuracy=75, speed=9),
+    "Dark Mage": Character(character_type="Enemy", name="Dark Mage", hp=22, attack=9, accuracy=65, speed=5),
+    "Troll": Character(character_type="Enemy", name="Troll", hp=40, attack=10, accuracy=45, speed=2),
+    "Wolf": Character(character_type="Enemy", name="Wolf", hp=16, attack=4, accuracy=80, speed=10),
+    "Vampire": Character(character_type="Enemy", name="Vampire", hp=25, attack=8, accuracy=70, speed=7),
+    "Assassin": Character(character_type="Enemy", name="Assassin", hp=12, attack=10, accuracy=85, speed=12),
+    "Giant Spider": Character(character_type="Enemy", name="Giant Spider", hp=22, attack=6, accuracy=60, speed=8),
+    "Wraith": Character(character_type="Enemy", name="Wraith", hp=18, attack=7, accuracy=75, speed=9)
+}
+
+enemy_list = [enemy for enemy in enemy_dict]
 
 
 def display_hp(player, enemy):
@@ -63,7 +90,7 @@ def combat_character_info_ui(character_type, name, hp, max_hp):
     if character_type == "Player":
         print(name)
         print(f"┌{"─" * (box_length + 10)}┐")
-        print(f"│HP {hp_bar.ljust(box_length + (len(hp_bar) - bars_amount))} {hp_info} │")
+        print(f"│HP {hp_bar.ljust(box_length + (len(hp_bar) - bars_amount))} {hp_info.rjust(5)} │")
         print(f"└{"─" * (box_length + 10)}┘")
     else:
         print(f"{" " * (box_length + 10)}{name}")
@@ -84,6 +111,13 @@ def player_turn(player, enemy):
 
         user_input = input("[A]ttack\n[H]eal\n> ")
         clear_terminal()
+
+        if enemy.speed > player.speed:
+            combat_character_ui(player, enemy)
+            enemy_turn(player, enemy)
+            clear_terminal()
+
+
 
         if user_input == "A":
             combat_character_ui(player, enemy)
@@ -114,25 +148,39 @@ def enemy_turn(player, enemy):
 
 def combat(player, enemy):
     while True:
+
         combat_character_ui(player, enemy)
         player_turn(player, enemy)
 
-        if enemy.hp <= 0 or player.hp <= 0:
-            clear_terminal()
-            print(f"You defeated {enemy.name}!")
-            input()
+        death = dead(player, enemy)
+        if death == "yes":
             break
 
-        enemy_turn(player,enemy)
+        if player.speed > enemy.speed:
+            enemy_turn(player,enemy)
 
-        if enemy.hp <= 0 or player.hp <= 0:
-            clear_terminal()
-            print(f"You defeated {enemy.name}!")
-            input()
+        death = dead(player, enemy)
+        if death == "yes":
             break
 
         clear_terminal()
 
-combat(knight, goblin)
+
+def dead(player, enemy):
+    if enemy.hp <= 0 or player.hp <= 0:
+        clear_terminal()
+
+        if player.hp <= 0:
+
+            print(f"YOU DIED")
+
+        else:
+            print(f"You defeated {enemy.name}!")
+
+        input()
+        return "yes"
+    return "no"
+
+combat(knight, enemy_dict[random.choice(enemy_list)])
 
 
