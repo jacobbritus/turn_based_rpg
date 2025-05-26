@@ -17,22 +17,32 @@ class Character:
         self.accuracy = accuracy
         self.speed = speed
 
-    def take_damage(self, amount, accuracy):
+    def take_damage(self, amount, accuracy, blocking):
         hit_or_not = random.randint(0, 100)
         critical_hit = random.randint(0, 100)
 
         if not hit_or_not > accuracy:
 
+            if blocking:
+                amount = round(amount/2)
+
             if critical_hit < 5:
-                print("Critical hit!")
                 self.hp -= amount
-                print(f"{self.name} took {float(amount * 1.25)} damage!")
+                if self.hp < 0:
+                    self.hp = 0
+
+
+                return "Critical hit!"
 
             else:
                 self.hp -= amount
-                print(f"{self.name} took {amount} damage!")
+                if self.hp < 0: self.hp = 0
+
+                return None
         else:
-            print(f"{self.name} evaded the attack!")
+            return f"{self.name} evaded the attack!"
+
+
 
     def heal(self, amount):
         self.hp += amount
@@ -109,12 +119,17 @@ def combat_character_ui(player, enemy):
 def player_turn(player, enemy):
     while True:
 
-        user_input = input("[A]ttack\n[H]eal\n> ")
+        user_input = input("[A]ttack\n[H]eal\n[B]lock\n> ")
         clear_terminal()
 
         if enemy.speed > player.speed:
             combat_character_ui(player, enemy)
-            enemy_turn(player, enemy)
+            if user_input == "B":
+                enemy_turn(player, enemy, blocking = True)
+                clear_terminal()
+                return False
+            else:
+                enemy_turn(player, enemy, blocking = False)
             clear_terminal()
 
 
@@ -122,14 +137,23 @@ def player_turn(player, enemy):
         if user_input == "A":
             combat_character_ui(player, enemy)
 
+            message = enemy.take_damage(player.attack, player.accuracy, blocking = False)
+            clear_terminal()
+
+            combat_character_ui(player, enemy)
+
             print(f"{player.name} attacked {enemy.name}.")
-            enemy.take_damage(player.attack, player.accuracy)
+            if message: print(message)
+
             input()
 
             clear_terminal()
             combat_character_ui(player, enemy)
 
-            return
+            return False
+        if user_input == "B":
+            return True
+
         elif user_input == "H":
             combat_character_ui(player, enemy)
 
@@ -139,25 +163,39 @@ def player_turn(player, enemy):
             clear_terminal()
             combat_character_ui(player, enemy)
 
-            return
+            return False
 
-def enemy_turn(player, enemy):
+def enemy_turn(player, enemy, blocking):
+
+    if blocking:
+
+        player.take_damage(enemy.attack, enemy.accuracy, blocking=True)
+        message = f"{player.name} blocked!"
+    else:
+        message = player.take_damage(enemy.attack, enemy.accuracy, blocking=False)
+
+    clear_terminal()
+    combat_character_ui(player, enemy)
+
     print(f"{enemy.name} attacked {player.name}.")
-    player.take_damage(enemy.attack, enemy.accuracy)
+    if message: print(message)
+
+
     input()
+
 
 def combat(player, enemy):
     while True:
 
         combat_character_ui(player, enemy)
-        player_turn(player, enemy)
+        blocking = player_turn(player, enemy)
 
         death = dead(player, enemy)
         if death == "yes":
             break
 
         if player.speed > enemy.speed:
-            enemy_turn(player,enemy)
+            enemy_turn(player, enemy, blocking)
 
         death = dead(player, enemy)
         if death == "yes":
@@ -181,6 +219,8 @@ def dead(player, enemy):
         return "yes"
     return "no"
 
-combat(knight, enemy_dict[random.choice(enemy_list)])
+while True:
+    combat(knight, enemy_dict[random.choice(enemy_list)])
+    knight.hp = 30
 
 
