@@ -32,15 +32,15 @@ class Character:
                     self.hp = 0
 
 
-                return "Critical hit!"
+                return True, "Critical hit!"
 
             else:
                 self.hp -= amount
                 if self.hp < 0: self.hp = 0
 
-                return None
+                return True, None
         else:
-            return f"{self.name} evaded the attack!"
+            return True, f"{self.name} evaded the attack!"
 
 
 
@@ -48,7 +48,7 @@ class Character:
         self.hp += amount
         if self.hp > self.max_hp:
             self.hp = self.max_hp
-        print(f"{self.name} drank a health potion and regained {amount} hp!")
+        return False, f"{self.name} drank a health potion and regained {amount} hp!"
 
 
 knight = Character(character_type = "Player", name = "Knight", hp = 30, attack = 5, accuracy = 80, speed = 7)
@@ -109,6 +109,15 @@ def combat_character_ui(player, enemy):
     combat_character_ui_maker(player.character_type, player.name, player.hp, player.max_hp)
 
 
+def bottom_box(action, attacker, receiver, message):
+    box_length = 60
+    print(f"┌{"─" * box_length}┐")
+    if action:
+        print(f"│ {attacker.name} attacked {receiver.name + ".".ljust(box_length - (len(attacker.name) + len(receiver.name) + 12))} │")
+    if message: print(f"│ {message.ljust(box_length - 2)} │")
+    print(f"└{"─" * box_length}┘")
+    input()
+
 
 def player_turn(player, enemy):
     while True:
@@ -128,14 +137,22 @@ def player_turn(player, enemy):
 
 
         if user_input == "A":
+            # change = 1
+            # message = None
+            #
+            # while change != player.attack:
+            #     combat_character_ui(player, enemy)
+            #     message = enemy.take_damage(change, player.accuracy, blocking=False)
+            #     change += 1
+            #     clear_terminal()
+
+
             combat_character_ui(player, enemy)
-            message = enemy.take_damage(player.attack, player.accuracy, blocking = False)
+            action, message = enemy.take_damage(player.attack, player.accuracy, blocking = False)
             clear_terminal()
 
             combat_character_ui(player, enemy)
-            print(f"{player.name} attacked {enemy.name}.")
-            if message: print(message)
-            input()
+            bottom_box(action, player, enemy, message)
 
             clear_terminal()
             combat_character_ui(player, enemy)
@@ -146,9 +163,13 @@ def player_turn(player, enemy):
 
         elif user_input == "H":
             combat_character_ui(player, enemy)
+            action, message = player.heal(5)
 
-            player.heal(5)
-            input()
+            clear_terminal()
+            combat_character_ui(player, enemy)
+            bottom_box(action, player, enemy, message)
+
+
 
             clear_terminal()
             combat_character_ui(player, enemy)
@@ -159,16 +180,14 @@ def enemy_turn(player, enemy, blocking):
 
     if blocking:
 
-        player.take_damage(enemy.attack, enemy.accuracy, blocking=True)
+        action, message = player.take_damage(enemy.attack, enemy.accuracy, blocking=True)
         message = f"{player.name} blocked!"
     else:
-        message = player.take_damage(enemy.attack, enemy.accuracy, blocking=False)
+        action, message = player.take_damage(enemy.attack, enemy.accuracy, blocking=False)
 
     clear_terminal()
     combat_character_ui(player, enemy)
-    print(f"{enemy.name} attacked {player.name}.")
-    if message: print(message)
-    input()
+    bottom_box(action, enemy, player, message)
 
 
 def combat(player, enemy):
