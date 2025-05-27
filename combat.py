@@ -53,9 +53,6 @@ class Character:
 
 knight = Character(character_type = "Player", name = "Knight", hp = 30, attack = 5, accuracy = 80, speed = 7)
 
-
-goblin = Character(character_type = "Enemy", name = "Goblin", hp = 15, attack = 3, accuracy = 50, speed = 8)
-
 enemy_dict = {
     "Goblin": Character(character_type="Enemy", name="Goblin", hp=15, attack=3, accuracy=70, speed=8),
     "Orc": Character(character_type="Enemy", name="Orc", hp=30, attack=7, accuracy=50, speed=3),
@@ -74,11 +71,8 @@ enemy_dict = {
 enemy_list = [enemy for enemy in enemy_dict]
 
 
-def display_hp(player, enemy):
-    print(f"                      {enemy.name}: {enemy.hp}")
-    print(f"{player.name}: {player.hp}\n")
 
-def combat_character_info_ui(character_type, name, hp, max_hp):
+def combat_character_ui_maker(character_type, name, hp, max_hp):
     box_length = 20
     hp_info = str(hp) + "/" + str(max_hp)
 
@@ -111,14 +105,13 @@ def combat_character_info_ui(character_type, name, hp, max_hp):
 
 
 def combat_character_ui(player, enemy):
-    combat_character_info_ui(enemy.character_type, enemy.name, enemy.hp, enemy.max_hp)
-    combat_character_info_ui(player.character_type, player.name, player.hp, player.max_hp)
+    combat_character_ui_maker(enemy.character_type, enemy.name, enemy.hp, enemy.max_hp)
+    combat_character_ui_maker(player.character_type, player.name, player.hp, player.max_hp)
 
 
 
 def player_turn(player, enemy):
     while True:
-
         user_input = input("[A]ttack\n[H]eal\n[B]lock\n> ")
         clear_terminal()
 
@@ -136,15 +129,12 @@ def player_turn(player, enemy):
 
         if user_input == "A":
             combat_character_ui(player, enemy)
-
             message = enemy.take_damage(player.attack, player.accuracy, blocking = False)
             clear_terminal()
 
             combat_character_ui(player, enemy)
-
             print(f"{player.name} attacked {enemy.name}.")
             if message: print(message)
-
             input()
 
             clear_terminal()
@@ -176,11 +166,8 @@ def enemy_turn(player, enemy, blocking):
 
     clear_terminal()
     combat_character_ui(player, enemy)
-
     print(f"{enemy.name} attacked {player.name}.")
     if message: print(message)
-
-
     input()
 
 
