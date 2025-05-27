@@ -118,8 +118,10 @@ def bottom_box(action, attacker, receiver, message):
     print(f"└{"─" * box_length}┘")
     input()
 
+# it'll be easy to add menu options info with this:
+def combat_menu_options(player, enemy):
 
-def player_turn(player, enemy):
+
     while True:
         box_length = 10
         print(f"┌{"─" * box_length}┐")
@@ -128,27 +130,29 @@ def player_turn(player, enemy):
         print(f"│ [B]lock  │")
         print(f"└{"─" * box_length}┘")
         user_input = input("> ")
-        clear_terminal()
 
+        if user_input in ["A", "H", "B"]:
+            clear_terminal()
+            return user_input
+        else:
 
-        if enemy.speed > player.speed:
+            clear_terminal()
             combat_character_ui(player, enemy)
 
-            # if player blocks
-            if user_input == "B":
-                enemy_turn(player, enemy, blocking = True)
-                clear_terminal()
-                return False
-
-            # if player doesn't block
-            else:
-                enemy_turn(player, enemy, blocking = False)
-
-                if player.hp == 0:
-                    return False
-            clear_terminal()
+def speed_check(player, enemy):
+    if player.speed > enemy.speed:
+        return "player"
+    elif enemy.speed > player.speed:
+        return "enemy"
+    else:
+        choices = ["enemy", "player"]
+        random.shuffle(choices)
+        return choices[0]
 
 
+def player_turn(user_input, player, enemy):
+        user_input = user_input
+        combat_character_ui(player, enemy)
 
         if user_input == "A":
             # enemy gets attacked, terminal clears and updated enemy's hp and bottom box message gets displayed.
@@ -158,10 +162,9 @@ def player_turn(player, enemy):
             bottom_box(action, player, enemy, message)
 
         if user_input == "B":
-            return True
+            pass
 
         elif user_input == "H":
-            combat_character_ui(player, enemy)
             action, message = player.heal(5)
 
             clear_terminal()
@@ -169,14 +172,12 @@ def player_turn(player, enemy):
             bottom_box(action, player, enemy, message)
 
         clear_terminal()
-        combat_character_ui(player, enemy)
-        return False
 
 
 def enemy_turn(player, enemy, blocking):
+    combat_character_ui(player, enemy)
 
     if blocking:
-
         action, message = player.take_damage(enemy.attack, enemy.accuracy, blocking=True)
 
         #if attack wasn't evaded
@@ -188,48 +189,45 @@ def enemy_turn(player, enemy, blocking):
     combat_character_ui(player, enemy)
     bottom_box(action, enemy, player, message)
 
+    clear_terminal()
 
-def combat(player, enemy):
+def combat2(player, enemy):
     while True:
-
+        first_turn = speed_check(player, enemy)
         combat_character_ui(player, enemy)
-        blocking = player_turn(player, enemy)
+        user_input = combat_menu_options(player, enemy)
 
-        death = dead(player, enemy)
-        if death == "yes":
-            break
+        blocking = True if user_input == "B" else False
 
-        if player.speed > enemy.speed:
+        if first_turn == "player":
+            player_turn(user_input, player, enemy)
+            if death_check(player, enemy): break
             enemy_turn(player, enemy, blocking)
+        elif first_turn == "enemy":
+            enemy_turn(player, enemy, blocking)
+            if death_check(player, enemy): break
+            player_turn(user_input, player, enemy)
 
-        death = dead(player, enemy)
-        if death == "yes":
-            break
-
-        clear_terminal()
+        if death_check(player, enemy): break
 
 
-def dead(player, enemy):
+def death_check(player, enemy):
     if enemy.hp <= 0 or player.hp <= 0:
         clear_terminal()
         combat_character_ui(player, enemy)
 
-        if player.hp <= 0:
 
-            message = f"You lost against {enemy.name}."
+        message = f"You lost against {enemy.name}." if player.hp <= 0 else f"You defeated {enemy.name}."
 
-
-        else:
-            message = f"You defeated {enemy.name}."
 
         bottom_box(None, player, enemy, message)
         clear_terminal()
 
-        return "yes"
-    return "no"
+        return True
+    return False
 
 while True:
-    combat(knight, enemy_dict[random.choice(enemy_list)])
+    combat2(knight, enemy_dict["Vampire"])
     knight.hp = 30
 
 
