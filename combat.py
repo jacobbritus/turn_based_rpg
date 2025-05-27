@@ -121,7 +121,13 @@ def bottom_box(action, attacker, receiver, message):
 
 def player_turn(player, enemy):
     while True:
-        user_input = input("[A]ttack\n[H]eal\n[B]lock\n> ")
+        box_length = 10
+        print(f"┌{"─" * box_length}┐")
+        print(f"│ [A]ttack │")
+        print(f"│ [H]eal   │")
+        print(f"│ [B]lock  │")
+        print(f"└{"─" * box_length}┘")
+        user_input = input("> ")
         clear_terminal()
 
         if enemy.speed > player.speed:
@@ -134,7 +140,8 @@ def player_turn(player, enemy):
                 enemy_turn(player, enemy, blocking = False)
             clear_terminal()
 
-
+            if player.hp < 0:
+                return "yes"
 
         if user_input == "A":
             # change = 1
@@ -175,6 +182,10 @@ def player_turn(player, enemy):
             combat_character_ui(player, enemy)
 
             return False
+        else:
+            clear_terminal()
+            combat_character_ui(player, enemy)
+
 
 def enemy_turn(player, enemy, blocking):
 
@@ -213,15 +224,19 @@ def combat(player, enemy):
 def dead(player, enemy):
     if enemy.hp <= 0 or player.hp <= 0:
         clear_terminal()
+        combat_character_ui(player, enemy)
 
         if player.hp <= 0:
 
-            print(f"YOU DIED")
+            message = f"You lost against {enemy.name}"
+
 
         else:
-            print(f"You defeated {enemy.name}!")
+            message = f"You defeated {enemy.name}!"
 
-        input()
+        bottom_box(None, player, enemy, message)
+        clear_terminal()
+
         return "yes"
     return "no"
 
