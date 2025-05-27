@@ -130,41 +130,33 @@ def player_turn(player, enemy):
         user_input = input("> ")
         clear_terminal()
 
+
         if enemy.speed > player.speed:
             combat_character_ui(player, enemy)
+
+            # if player blocks
             if user_input == "B":
                 enemy_turn(player, enemy, blocking = True)
                 clear_terminal()
                 return False
+
+            # if player doesn't block
             else:
                 enemy_turn(player, enemy, blocking = False)
+
+                if player.hp == 0:
+                    return False
             clear_terminal()
 
-            if player.hp < 0:
-                return "yes"
+
 
         if user_input == "A":
-            # change = 1
-            # message = None
-            #
-            # while change != player.attack:
-            #     combat_character_ui(player, enemy)
-            #     message = enemy.take_damage(change, player.accuracy, blocking=False)
-            #     change += 1
-            #     clear_terminal()
-
-
-            combat_character_ui(player, enemy)
+            # enemy gets attacked, terminal clears and updated enemy's hp and bottom box message gets displayed.
             action, message = enemy.take_damage(player.attack, player.accuracy, blocking = False)
             clear_terminal()
-
             combat_character_ui(player, enemy)
             bottom_box(action, player, enemy, message)
 
-            clear_terminal()
-            combat_character_ui(player, enemy)
-
-            return False
         if user_input == "B":
             return True
 
@@ -176,15 +168,9 @@ def player_turn(player, enemy):
             combat_character_ui(player, enemy)
             bottom_box(action, player, enemy, message)
 
-
-
-            clear_terminal()
-            combat_character_ui(player, enemy)
-
-            return False
-        else:
-            clear_terminal()
-            combat_character_ui(player, enemy)
+        clear_terminal()
+        combat_character_ui(player, enemy)
+        return False
 
 
 def enemy_turn(player, enemy, blocking):
@@ -192,7 +178,9 @@ def enemy_turn(player, enemy, blocking):
     if blocking:
 
         action, message = player.take_damage(enemy.attack, enemy.accuracy, blocking=True)
-        message = f"{player.name} blocked!"
+
+        #if attack wasn't evaded
+        if not message: message = f"{player.name} blocked!"
     else:
         action, message = player.take_damage(enemy.attack, enemy.accuracy, blocking=False)
 
@@ -228,11 +216,11 @@ def dead(player, enemy):
 
         if player.hp <= 0:
 
-            message = f"You lost against {enemy.name}"
+            message = f"You lost against {enemy.name}."
 
 
         else:
-            message = f"You defeated {enemy.name}!"
+            message = f"You defeated {enemy.name}."
 
         bottom_box(None, player, enemy, message)
         clear_terminal()
