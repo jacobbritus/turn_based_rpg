@@ -32,15 +32,15 @@ class Character:
                     self.hp = 0
 
 
-                return True, "Critical hit!"
+                return "Critical hit!"
 
             else:
                 self.hp -= amount
                 if self.hp < 0: self.hp = 0
 
-                return True, None
+                return None
         else:
-            return True, f"{self.name} evaded the attack!"
+            return f"{self.name} evaded the attack!"
 
 
 
@@ -48,7 +48,7 @@ class Character:
         self.hp += amount
         if self.hp > self.max_hp:
             self.hp = self.max_hp
-        return False, f"{self.name} drank a health potion and regained {amount} hp!"
+        return f"{self.name} drank a health potion and regained {amount} hp!"
 
 
 knight = Character(character_type = "Player", name = "Knight", hp = 30, attack = 5, accuracy = 80, speed = 7)
@@ -109,19 +109,27 @@ def combat_character_ui(player, enemy):
     combat_character_ui_maker(player.character_type, player.name, player.hp, player.max_hp)
 
 
-def bottom_box(action, attacker, receiver, message):
+def bottom_box(player, enemy, message_one, message_two):
+    #remove action, if message 2 clear terminal and show the message
     box_length = 60
+
     print(f"┌{"─" * box_length}┐")
-    if action:
-        print(f"│ {attacker.name} attacked {receiver.name + ".".ljust(box_length - (len(attacker.name) + len(receiver.name) + 12))} │")
-    if message: print(f"│ {message.ljust(box_length - 2)} │")
+    print(f"│ {message_one.ljust(box_length - 2)} │")
     print(f"└{"─" * box_length}┘")
     input()
 
+    if message_two:
+        clear_terminal()
+        combat_character_ui(player, enemy)
+        print(f"┌{"─" * box_length}┐")
+        print(f"│ {message_two.ljust(box_length - 2)} │")
+        print(f"└{"─" * box_length}┘")
+        input()
+
+
+
 # it'll be easy to add menu options info with this:
 def combat_menu_options(player, enemy):
-
-
     while True:
         box_length = 10
         print(f"┌{"─" * box_length}┐")
@@ -156,26 +164,32 @@ def player_turn(user_input, player, enemy):
 
         if user_input == "A":
             # enemy gets attacked, terminal clears and updated enemy's hp and bottom box message gets displayed.
+            option_message = f"{player.name} attacked."
+
             action, message = enemy.take_damage(player.attack, player.accuracy, blocking = False)
             clear_terminal()
             combat_character_ui(player, enemy)
-            bottom_box(action, player, enemy, message)
+            bottom_box(player, enemy, option_message, message)
 
         if user_input == "B":
             pass
 
         elif user_input == "H":
+            option_message = f"{player.name} used a healing potion."
+
             action, message = player.heal(5)
 
             clear_terminal()
             combat_character_ui(player, enemy)
-            bottom_box(action, player, enemy, message)
+            bottom_box(player, enemy, option_message, message)
 
         clear_terminal()
 
 
 def enemy_turn(player, enemy, blocking):
     combat_character_ui(player, enemy)
+
+    option_message = f"{enemy.name} attacked."
 
     if blocking:
         action, message = player.take_damage(enemy.attack, enemy.accuracy, blocking=True)
@@ -187,7 +201,7 @@ def enemy_turn(player, enemy, blocking):
 
     clear_terminal()
     combat_character_ui(player, enemy)
-    bottom_box(action, enemy, player, message)
+    bottom_box(player, enemy, option_message, message)
 
     clear_terminal()
 
@@ -220,7 +234,7 @@ def death_check(player, enemy):
         message = f"You lost against {enemy.name}." if player.hp <= 0 else f"You defeated {enemy.name}."
 
 
-        bottom_box(None, player, enemy, message)
+        bottom_box(player, enemy, message, None)
         clear_terminal()
 
         return True
@@ -230,4 +244,6 @@ while True:
     combat2(knight, enemy_dict["Vampire"])
     knight.hp = 30
 
+# def update_screen(player, enemy):
+#     ...
 
