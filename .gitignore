@@ -2,6 +2,7 @@ chatGPT_roadmap
 turnbasedrpg_journal
 classes.py
 testing.py
+pygame_learning_environment/base_pygame_project.py
 *.pyc
 
 # So if files are still showing on GitHub but you want to ignore them:

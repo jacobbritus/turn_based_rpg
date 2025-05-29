@@ -17,6 +17,12 @@ class Character:
         self.accuracy = accuracy
         self.speed = speed
 
+    def clamp_hp(self):
+        if self.hp > self.max_hp:
+            self.hp = self.max_hp
+        elif self.hp < 0:
+            self.hp = 0
+
     def take_damage(self, amount, accuracy, blocking):
         hit_or_not = random.randint(0, 100)
         critical_hit = random.randint(0, 100)
@@ -28,15 +34,13 @@ class Character:
 
             if critical_hit < 5:
                 self.hp -= amount
-                if self.hp < 0:
-                    self.hp = 0
-
+                self.clamp_hp()
 
                 return "Critical hit!"
 
             else:
                 self.hp -= amount
-                if self.hp < 0: self.hp = 0
+                self.clamp_hp()
 
                 return None
         else:
@@ -46,9 +50,11 @@ class Character:
 
     def heal(self, amount):
         self.hp += amount
-        if self.hp > self.max_hp:
-            self.hp = self.max_hp
+        self.clamp_hp()
         return f"{self.name} drank a health potion and regained {amount} hp!"
+
+
+
 
 
 knight = Character(character_type = "Player", name = "Knight", hp = 30, attack = 5, accuracy = 80, speed = 7)
@@ -74,6 +80,7 @@ enemy_list = [enemy for enemy in enemy_dict]
 
 def combat_character_ui_maker(character_type, name, hp, max_hp):
     box_length = 20
+
     hp_info = str(hp) + "/" + str(max_hp)
 
     #displayed tags
@@ -144,8 +151,7 @@ def combat_menu_options(player, enemy):
             return user_input
         else:
 
-            clear_terminal()
-            combat_character_ui(player, enemy)
+            update_screen(player, enemy)
 
 def speed_check(player, enemy):
     if player.speed > enemy.speed:
@@ -159,16 +165,14 @@ def speed_check(player, enemy):
 
 
 def player_turn(user_input, player, enemy):
-        user_input = user_input
         combat_character_ui(player, enemy)
 
         if user_input == "A":
             # enemy gets attacked, terminal clears and updated enemy's hp and bottom box message gets displayed.
             option_message = f"{player.name} attacked."
 
-            action, message = enemy.take_damage(player.attack, player.accuracy, blocking = False)
-            clear_terminal()
-            combat_character_ui(player, enemy)
+            message = enemy.take_damage(player.attack, player.accuracy, blocking = False)
+            update_screen(player, enemy)
             bottom_box(player, enemy, option_message, message)
 
         if user_input == "B":
@@ -177,10 +181,9 @@ def player_turn(user_input, player, enemy):
         elif user_input == "H":
             option_message = f"{player.name} used a healing potion."
 
-            action, message = player.heal(5)
+            message = player.heal(5)
 
-            clear_terminal()
-            combat_character_ui(player, enemy)
+            update_screen(player, enemy)
             bottom_box(player, enemy, option_message, message)
 
         clear_terminal()
@@ -192,15 +195,14 @@ def enemy_turn(player, enemy, blocking):
     option_message = f"{enemy.name} attacked."
 
     if blocking:
-        action, message = player.take_damage(enemy.attack, enemy.accuracy, blocking=True)
+        message = player.take_damage(enemy.attack, enemy.accuracy, blocking=True)
 
         #if attack wasn't evaded
         if not message: message = f"{player.name} blocked!"
     else:
-        action, message = player.take_damage(enemy.attack, enemy.accuracy, blocking=False)
+        message = player.take_damage(enemy.attack, enemy.accuracy, blocking=False)
 
-    clear_terminal()
-    combat_character_ui(player, enemy)
+    update_screen(player, enemy)
     bottom_box(player, enemy, option_message, message)
 
     clear_terminal()
@@ -227,8 +229,7 @@ def combat2(player, enemy):
 
 def death_check(player, enemy):
     if enemy.hp <= 0 or player.hp <= 0:
-        clear_terminal()
-        combat_character_ui(player, enemy)
+        update_screen(player, enemy)
 
 
         message = f"You lost against {enemy.name}." if player.hp <= 0 else f"You defeated {enemy.name}."
@@ -240,10 +241,16 @@ def death_check(player, enemy):
         return True
     return False
 
-while True:
-    combat2(knight, enemy_dict["Vampire"])
-    knight.hp = 30
 
-# def update_screen(player, enemy):
-#     ...
+def update_screen(player, enemy):
+    clear_terminal()
+    combat_character_ui(player, enemy)
+
+
+while True:
+    combat2(knight, enemy_dict[random.choice(enemy_list)])
+    knight.hp = knight.max_hp
+
+
+
 
